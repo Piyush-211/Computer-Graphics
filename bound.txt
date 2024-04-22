@@ -1,0 +1,113 @@
+#include <GL/glut.h>
+#include <iostream>
+using namespace std;
+
+class FillAlgorithm {
+private:
+    int ww, wh;
+    int ch;
+    float intCol[3];
+    float fillCol[3];
+    float fillColor[3];
+    float borderColor[3];
+
+public:
+    FillAlgorithm(int width, int height) : ww(width), wh(height) {
+        intCol[0] = 1.0; intCol[1] = 1.0; intCol[2] = 1.0;
+        fillCol[0] = 1.0; fillCol[1] = 0.0; fillCol[2] = 0.0;
+        fillColor[0] = 0.0; fillColor[1] = 0.0; fillColor[2] = 1.0;
+        borderColor[0] = 1.0; borderColor[1] = 0.0; borderColor[2] = 0.0;
+        ch = 0;
+    }
+
+    void setPixel(int pointx, int pointy, float f[3]) {
+        glBegin(GL_POINTS);
+        glColor3fv(f);
+        glVertex2i(pointx, pointy);
+        glEnd();
+        glFlush();
+    }
+
+    void getPixel(int x, int y, float pixels[3]) {
+        glReadPixels(x, y, 1.0, 1.0, GL_RGB, GL_FLOAT, pixels);
+    }
+
+    void drawPolygon(int x1, int y1, int x2, int y2) {
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(x1, y1);
+        glVertex2i(x1, y2);
+        glVertex2i(x2, y2);
+        glVertex2i(x2, y1);
+        glEnd();
+        glFlush();
+    }
+
+    void floodfill4(int x, int y, float oldcolor[3], float newcolor[3]) {
+        // Implementation of flood fill algorithm
+    }
+
+    void boundaryFill4(int x, int y, float fillColor[3], float borderColor[3]) {
+        // Implementation of boundary fill algorithm
+    }
+
+    void mouse(int btn, int state, int x, int y) {
+        if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+            int xi = x;
+            int yi = (wh - y);
+            if (ch == 1) {
+                floodfill4(xi, yi, intCol, fillCol);
+            }
+            else if (ch == 2) {
+                boundaryFill4(xi, yi, fillColor, borderColor);
+            }
+        }
+        glFlush();
+    }
+
+    void keyboard(unsigned char key, int x, int y) {
+        switch (key) {
+        case 'f':
+            ch = 1;
+            break;
+        case 'b':
+            ch = 2;
+            break;
+        }
+        glutPostRedisplay();
+    }
+
+    void initialize() {
+        glViewport(0, 0, ww, wh);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluOrtho2D(0.0, (GLdouble)ww, 0.0, (GLdouble)wh);
+        glMatrixMode(GL_MODELVIEW);
+        glClearColor(1.0, 1.0, 1.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+};
+
+void display() {
+    // Empty
+}
+
+int main(int argc, char** argv) {
+    int ww = 600, wh = 500;
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(ww, wh);
+    glutCreateWindow("Flood-Fill-Recursive and Boundary- Fill-Recursive");
+
+    FillAlgorithm fillAlg(ww, wh);
+
+    fillAlg.initialize();
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(fillAlg.keyboard);
+    glutMouseFunc(fillAlg.mouse);
+
+    cout << "\n f: flood fill algorithm";
+    cout << "\n b: boundary fill algorithm";
+    glutMainLoop();
+    return 0;
+}
